@@ -90,6 +90,7 @@ def rpc(method: str, params: Any) -> Any:
 
         if response.status_code == 429 and "retry-after" in response.headers:
             wait = int(response.headers["retry-after"])
+            # XXX this is not quite accurate given the extra 1 second waiting
             logging.warning(f"Rate limited and will retry after {wait} seconds")
             time.sleep(wait)
 
@@ -106,6 +107,8 @@ def get_blocks(begin_slot: int, end_slot: int) -> list[int]:
     :param end_slot: the end slot number, inclusive
     :return: list of slot numbers between begin and end
     """
+    # XXX assumes the json output from RPC is valid so this won't KeyError,
+    # same for later [] operations, omitting checks for simplicity
     return rpc("getBlocks", [begin_slot, end_slot])["result"]
 
 
